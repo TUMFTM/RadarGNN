@@ -1,7 +1,7 @@
 import numpy as np
 import torch
 
-from radargnn.utils.math import get_stats_of_predicted_box_points, point_iou, get_discrete_iou, is_point_in_rect
+from gnnradarobjectdetection.utils.math import get_stats_of_predicted_box_points, point_iou, get_discrete_iou, is_point_in_rect
 from detectron2.layers import nms_rotated
 
 

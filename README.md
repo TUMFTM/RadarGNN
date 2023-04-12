@@ -90,7 +90,7 @@ It is recommended to use the provided [Dockerfile](Dockerfile) to build the deve
 
 1. Ensure the you are inside the repository folder.
 ```
-cd radargnn/
+cd RadarGNN/
 ```
 2. Create the docker image.
 ```
@@ -100,7 +100,7 @@ docker build -t gnn:1.0 .
 ```
 docker run -it --rm --gpus all -v ${local_path_to_data_folder}$:/app/data -v ${local_path_to_configurations_folder}$:/app/configurations gnn:1.0
 ```
-4. Install the radargnn package inside the container.
+4. Install the gnnradarobjectdetection package inside the container.
 ```
 python3 -m pip install -e .
 ```
@@ -121,7 +121,7 @@ The configuration file contains three sections with relevant settings for the co
 ### 2. Create a graph-dataset
 Next, the graph-dataset needs to be created by converting the radar point clouds of the raw datasets to a graph data structure. To do this, execute the following command inside the docker container: 
 ```
-python3 src/radargnn/create_dataset.py --dataset ${path_to_raw_dataset_folder}$ --config ${path_to_config_file}$
+python3 src/gnnradarobjectdetection/create_dataset.py --dataset ${path_to_raw_dataset_folder}$ --config ${path_to_config_file}$
 ```
 
 ```
@@ -138,7 +138,7 @@ The created graph-dataset is saved in the automatically created folder "{path_to
 ### 3. Create and train a model
 In a next step, you can use the created graph-dataset to train a model. To do this, run the following command inside the docker container: 
 ```
-python3 src/radargnn/train.py --data ${path_to_graph_dataset_folder}$ --results ${path_to_results_folder}$ --config ${path_to_config_file}$
+python3 src/gnnradarobjectdetection/train.py --data ${path_to_graph_dataset_folder}$ --results ${path_to_results_folder}$ --config ${path_to_config_file}$
 ```
 ```
 usage:             train.py [--data] [--results] [--config]
@@ -155,7 +155,7 @@ Within the provided "results" folder, a new "model" folder is automatically crea
 ### 4. Evaluate a trained model 
 Finally, you can evaluate a trained model using the following command inside the docker container: 
 ```
-python3 src/radargnn/evaluate.py --data ${path_to_graph_dataset_folder}$ --model ${path_to_model_folder}$ --config ${path_to_config_file}$ 
+python3 src/gnnradarobjectdetection/evaluate.py --data ${path_to_graph_dataset_folder}$ --model ${path_to_model_folder}$ --config ${path_to_config_file}$ 
 ```
 ```
 usage:             evaluate.py [--data] [--model] [--config]

@@ -1,11 +1,11 @@
 import numpy as np
 from sklearn.neighbors import kneighbors_graph
 
-from radargnn.preprocessor.bounding_box import RotationInvariantRelativeRotatedBoundingBox
-from radargnn.preprocessor.configs import GraphConstructionConfiguration
-from radargnn.preprocessor.radar_point_cloud import RadarPointCloud
-from radargnn.preprocessor.radarscenes.dataset_creation import GraphConstructor, GroundTruthCreator, PointCloudProcessor
-from radargnn.preprocessor.radarscenes.configs import RadarScenesDatasetConfiguration
+from gnnradarobjectdetection.preprocessor.bounding_box import RotationInvariantRelativeRotatedBoundingBox
+from gnnradarobjectdetection.preprocessor.configs import GraphConstructionConfiguration
+from gnnradarobjectdetection.preprocessor.radar_point_cloud import RadarPointCloud
+from gnnradarobjectdetection.preprocessor.radarscenes.dataset_creation import GraphConstructor, GroundTruthCreator, PointCloudProcessor
+from gnnradarobjectdetection.preprocessor.radarscenes.configs import RadarScenesDatasetConfiguration
 
 
 def test_remove_points_from_radar_point_cloud_with_nan():

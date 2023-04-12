@@ -1,6 +1,6 @@
-from radargnn.gnn.mpnn_layers import MPNNConv, RadarPointGNNConv
-from radargnn.gnn.gnn_models import get_mlp, DetNetBasic
-from radargnn.gnn.configs import GNNArchitectureConfig
+from gnnradarobjectdetection.gnn.mpnn_layers import MPNNConv, RadarPointGNNConv
+from gnnradarobjectdetection.gnn.gnn_models import get_mlp, DetNetBasic
+from gnnradarobjectdetection.gnn.configs import GNNArchitectureConfig
 import torch
 from torch_geometric.nn.dense.linear import Linear
 import numpy as np

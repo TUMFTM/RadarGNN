@@ -1,6 +1,6 @@
 import numpy as np
-import radargnn.graph_constructor.graph as gr
-import radargnn.graph_constructor.features as ft
+import gnnradarobjectdetection.graph_constructor.graph as gr
+import gnnradarobjectdetection.graph_constructor.features as ft
 
 
 def test_point_pair_features():
