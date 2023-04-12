@@ -1,0 +1,7 @@
+torchmetrics==0.10.0
+radar_scenes==1.0.3
+pyyaml==6.0
+networkx==2.8.7
+matplotlib==3.3.4
+ray==2.0.0
+nuscenes-devkit==1.1.9

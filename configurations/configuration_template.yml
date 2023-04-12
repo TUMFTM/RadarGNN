@@ -1,0 +1,108 @@
+#------------------------------------------------------------------------------------#
+#                     TEMPLATE FOR CREATING THE CONFIGURATION FILE                   #
+#                                                                                    #
+# With following information per configurable parameter:                             #
+#   - example choice for the parameter                                               #   
+#   - "standard" value available or not                                              #
+#       - if "standard" value available -> parameter optional: O = "standardvalue"   #
+#       - if no "standard" value available -> parameter required: R                  #
+#------------------------------------------------------------------------------------#
+
+
+# ------------------------- CONFIGS FOR "CREATE_DATASET.PY" --------------------------#
+CREATE_DATASET:
+    dataset: radarscenes
+
+    DATASET_PROCESSING:
+        time_per_point_cloud_frame: 0.5                                             # R 
+        crop_point_cloud: True                                                      # R 
+        crop_settings: {"front": 100, "sides": 50}                                  # R
+        bounding_boxes_aligned: True                                                # R 
+        bb_invariance: "translation"                                                # R
+        create_small_subset: True                                                   # R
+        subset_settings: {"num_sequences": 2, "num_clouds_per_sequence": 3}         # R 
+        deterministic: False                                                        # O = False
+        seed: 0                                                                     # O = 0
+        parallelize: False                                                          # O = False
+
+    GRAPH_CONSTRUCTION:
+        graph_construction_algorithm: "knn"                               # R 
+        graph_construction_settings: {"k": 10, "r": 1}                    # R 
+        node_features: ["rcs", "velocity_vector", "time_index", "degree"] # R 
+        edge_features: ["relative_position"]                              # R 
+        edge_mode: "directed"                                             # R 
+        distance_definition: "X"                                          # R
+
+
+# ------------------------------ CONFIGS FOR "TRAIN.PY" ------------------------------#
+TRAIN:
+
+    MODEL_ARCHITECTURE:
+        node_feature_dimension: 5                     # R        
+        edge_feature_dimension: 2                     # R  
+        conv_layer_dimensions: [96, 224, 352]         # R 
+        classification_head_layer_dimensions: [6]     # R 
+        regression_head_layer_dimensions: [144, 4]    # R 
+
+        initial_node_feature_embedding: True                    # O = False
+        initial_edge_feature_embedding: True                    # O = False
+        node_feature_embedding_layer_dimensions: [12, 24, 48]   # O = None
+        edge_feature_embedding_layer_dimensions: [4, 8, 16]     # O = None
+
+        batch_norm_in_mlps: True                      # O = True 
+        conv_pre_mlp_layer_number: 1                  # O = 1
+        conv_post_mlp_layer_number: 1                 # O = 1
+        conv_layer_type: "MPNNConv"                   # O = "MPNNConv"
+        conv_use_edge_encoder: False                  # O = False
+        aggregation_function: "max"                   # O = "max"
+
+
+
+    TRAINING:
+        dataset: radarscenes                # R
+        bg_index: 5                         # R
+        learning_rate: 0.001                # R       
+        epochs: 2                           # R 
+        batch_size: 3                       # R 
+        shuffle: True                       # R 
+        
+        deterministic: False                                    # O = False
+        seed: 0                                                 # O = 0
+        set_weights_according_radar_scenes_distribution: False  # O = False
+        bb_loss_weight: 1                                       # O = 1
+        cls_loss_weight: 1                                      # O = 1
+        regularization_strength: 1e-4                           # O = 1e-4
+        reduce_lr_on_plateau_factor: 0.5                        # O = 0.5
+        reduce_lr_on_plateau_patience: 4                        # O = 10
+        early_stopping_patience: 6                              # O = 10
+        adapt_orientation_angle: False                          # O = False
+        class_weights: {"car": 1,
+                        "pedestrian": 1,
+                        "pedestrian_group": 1, 
+                        "two_wheeler": 1, 
+                        "large_vehicle": 1,
+                        "background": 0.05}                     # O: bg = 0.05, remaining classes = 1
+
+# ---------------------------- CONFIGS FOR "EVALUATE.PY" ----------------------------#
+EVALUATE:
+
+    POSTPROCESSING:
+        split: "validate"                               # R 
+        iou_for_nms: 0.01                               # R 
+        bg_index: 5                                     # R
+        min_object_score: {"car": 0.8,
+                            "pedestrian": 0.7,
+                            "pedestrian_group": 0.7, 
+                            "two_wheeler": 0.7, 
+                            "large_vehicle": 0.8}       # R  
+        max_score_for_background: 0.2                   # R 
+        iou_for_mAP: 0.3                                # R 
+
+        bb_invariance: "translation"                    # O = "translation"
+        adapt_orientation_angle: False                  # O = False
+
+        use_point_iou: True                             # O = False
+        get_mAP: True                                   # O = True
+        get_confusion: True                             # O = True
+        get_segmentation_f1: True                       # O = True
+        f1_class_averaging: None                        # O = None

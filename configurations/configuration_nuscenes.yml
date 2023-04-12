@@ -1,0 +1,78 @@
+# ------------------------- CONFIGS FOR "CREATE_DATASET.PY" --------------------------#
+CREATE_DATASET:
+    dataset: nuscenes
+
+    DATASET_PROCESSING:
+        version: "v1.0-trainval"
+        nsweeps: 6
+        crop_point_cloud: False
+        bounding_boxes_aligned: False
+        bb_invariance: "translation"
+        deterministic: True
+        seed: 123
+    
+    GRAPH_CONSTRUCTION:
+        graph_construction_algorithm: "knn"
+        graph_construction_settings: {"k": 20, "r": 1}
+        node_features: ["rcs", "velocity_vector", "time_index", "degree"]
+        edge_features: ["relative_position"]
+        edge_mode: "directed"
+        distance_definition: "X"
+
+# ------------------------------ CONFIGS FOR "TRAIN.PY" ------------------------------#
+TRAIN:
+
+    MODEL_ARCHITECTURE:
+        node_feature_dimension: 5
+        edge_feature_dimension: 2
+        conv_layer_dimensions: [224, 224, 128, 64, 32]
+        classification_head_layer_dimensions: [11]
+        regression_head_layer_dimensions: [16, 5]
+
+        initial_node_feature_embedding: True
+        initial_edge_feature_embedding: True
+        node_feature_embedding_layer_dimensions: [32, 64, 128, 224]
+        edge_feature_embedding_layer_dimensions: [4, 8, 16]
+        conv_layer_type: "MPNNConv"
+
+        batch_norm_in_mlps: False
+
+    TRAINING:
+        dataset: nuscenes
+        bg_index: 0
+        learning_rate: 0.001
+        epochs: 30
+        batch_size: 32
+        shuffle: True
+        
+        deterministic: True
+        seed: 123
+
+        exponential_lr_decay_factor: 0.95
+
+# ---------------------------- CONFIGS FOR "EVALUATE.PY" ----------------------------#
+EVALUATE:
+
+    POSTPROCESSING:
+        split: "validate"
+        bg_index: 0
+
+        max_score_for_background: 0.1
+        min_object_score: {"barrier": 0.4,
+                           "bicycle": 0.4,
+                           "bus": 0.4,
+                           "car": 0.6,
+                           "construction": 0.7,
+                           "motorcycle": 0.4,
+                           "pedestrian": 0.4,
+                           "trafficcone": 0.3,
+                           "trailer": 0.4,
+                           "truck": 0.4}
+        iou_for_nms: 0.3
+
+        bb_invariance: "translation"
+
+        get_mAP: False
+        get_confusion: True
+        get_segmentation_f1: True
+        f1_class_averaging: None

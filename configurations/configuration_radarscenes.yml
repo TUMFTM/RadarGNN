@@ -1,0 +1,80 @@
+# ------------------------- CONFIGS FOR "CREATE_DATASET.PY" --------------------------#
+CREATE_DATASET:
+    dataset: radarscenes
+
+    DATASET_PROCESSING:
+        time_per_point_cloud_frame: 0.5
+        crop_point_cloud: True
+        crop_settings: {"front": 100, "sides": 50}
+        bounding_boxes_aligned: False
+        bb_invariance: "translation"
+        create_small_subset: False
+        subset_settings: {}
+        
+        deterministic: True
+        seed: 123
+        parallelize: True
+    
+    GRAPH_CONSTRUCTION:
+        graph_construction_algorithm: "knn"
+        graph_construction_settings: {"k": 20, "r": 1}
+        node_features: ["rcs", "velocity_vector", "time_index", "degree"]
+        edge_features: ["relative_position"]
+        edge_mode: "directed"
+        distance_definition: "X"
+
+# ------------------------------ CONFIGS FOR "TRAIN.PY" ------------------------------#
+TRAIN:
+
+    MODEL_ARCHITECTURE:
+        node_feature_dimension: 5     
+        edge_feature_dimension: 2
+        conv_layer_dimensions: [224, 224, 128, 64, 32]
+        classification_head_layer_dimensions: [6]
+        regression_head_layer_dimensions: [16, 5]
+
+        initial_node_feature_embedding: True
+        initial_edge_feature_embedding: True
+        node_feature_embedding_layer_dimensions: [32, 64, 128, 224]
+        edge_feature_embedding_layer_dimensions: [4, 8, 16]
+        conv_layer_type: "MPNNConv"
+
+        batch_norm_in_mlps: False
+
+    TRAINING:
+        dataset: radarscenes
+        bg_index: 5
+        learning_rate: 0.001
+        epochs: 30
+        batch_size: 5
+        shuffle: True
+
+        deterministic: True
+        seed: 123
+
+        exponential_lr_decay_factor: 0.95
+    
+        bb_loss_weight: 0.5
+        regularization_strength: 0.000005
+        adapt_orientation_angle: True
+
+# ---------------------------- CONFIGS FOR "EVALUATE.PY" ----------------------------#
+EVALUATE:
+
+    POSTPROCESSING:
+        split: "validate"
+        iou_for_nms: 0.01
+        bg_index: 5
+        min_object_score: {"car": 0.5,
+                           "pedestrian": 0.5,
+                           "pedestrian_group": 0.5,
+                           "two_wheeler": 0.5,
+                           "large_vehicle": 0.5}
+        max_score_for_background: 0.2
+        iou_for_mAP: 0.3
+
+        use_point_iou: True
+
+        bb_invariance: "translation"
+
+        adapt_orientation_angle: True

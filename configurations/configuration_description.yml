@@ -1,0 +1,291 @@
+#------------------------------------------------------------------------------------#
+#                    DESCRIPTION FOR CREATING THE CONFIGURATION FILE                 #
+#                                                                                    #
+# With following information per configurable parameter:                             #
+#   - description of the parameter                                                   #
+#   - expected datatype                                                              #
+#   - "standard" value available or not                                              #
+#       - if "standard" value available -> parameter optional: O = "standardvalue"   #
+#       - if no "standard" value available -> parameter required: R = "example"      #
+#------------------------------------------------------------------------------------#
+
+
+
+# ------------------------- CONFIGS FOR "CREATE_DATASET.PY" --------------------------#
+CREATE_DATASET:
+    # Description: Dataset which is used for training and evaluation (either radarscenes or nuscenes)
+    dataset: str
+
+    DATASET_PROCESSING:
+        # Description: Version of the nuScenes dataset (only for nuScenes). One of either v1.0-mini, v1.0-trainval or v1.0-test
+        version: str
+
+        # Description: Number of aggregated consecutive sensor sweeps (only for nuScenes)
+        nsweeps: int  # 0 = 1
+
+        # Description: Bounding box scaling factor (only for nuScenes)
+        wlh_factor: float  # 0 = 1.0
+
+        # Description: Bounding box scaling value (only for nuScenes)
+        wlh_offset: float  # 0 = 0.0
+
+        # Description: Time in s for which radar sweeps are concatenated to one point-cloud-frame
+        time_per_point_cloud_frame: int                          # R = 500
+
+        # Description: Should the point cloud be cropped down in space
+        crop_point_cloud: bool                                   # R = True
+
+        # Description: Defines from which distance in m points are removed from in front and aside the car
+        # Form: Dict with two fields -> {"num_sequences": int, "num_clouds_per_sequence": int} 
+        crop_settings: dict                                      # R = {"front": 100, "sides": 50}
+
+        # Description: Defines wether aligned or rotated minimum enclosing rectangle bounding boxes are created
+        bounding_boxes_aligned: bool                             # R = True
+
+        # Description: Defines the Format of ROTATED bounding boxes and with it also the invariances of bounding boxes
+        # Form: Choose from:     - "none"          - bb = [x, y, l, w, theta_x]    -> no invariance
+        #                        - "translation"   - bb = [dx, dy, l, w, theta_x]  -> translation invariance
+        #                        - "en"            - bb = [d, theta_v_p_nn_v_p_c, l, w, theta_v_p_nn_v_dir]  -> E(n) invariant
+        bb_invariance: str                                         # R = "translation"
+
+
+        # Description: Process whole RadarScenes dataset or only a smaller subset
+        create_small_subset: bool                                # R = True
+
+        # Description: Defines the subset to be created
+        # Form: Dict with two fields -> {"num_sequences": int, "num_clouds_per_sequence": int}
+        subset_settings: dict                                    # R = {"num_sequences": 2, "num_clouds_per_sequence": 3}
+
+        # Description: Fix seed and use if possible deterministic operations
+        deterministic: bool                 # O = False
+        seed: int                           # O = 0
+
+        # Enables parallelization of graph dataset creation using all available CPUs
+        # - ATTENTION: Requires a lot of RAM
+        #   -> Processes and thus loads whole train/test/validation split and created graph data in RAM
+        #   -> Program logic can be improved to require a lot less RAM 
+        # - ATTENTION: May violate determinism 
+        #   -> Order of graphs in graph dataset may vary
+        parallelize: bool                   # O = False
+
+    GRAPH_CONSTRUCTION:
+        # Description: Algorithm to define edges
+        # Form: Choose between:     - "knn"
+        #                           - "radius"
+        graph_construction_algorithm: str                         # R = "knn"
+
+        # Description: Define settings for graph construction algorithm
+        # Form: Dict with two fields -> {"k": int, "r": int}
+        graph_construction_settings: dict                         # R = {"k": 10, "r": 2}
+
+        # Description: List of initial node features of the graph
+        # Form: Choose from:    - "rcs"
+        #                       - "degree"
+        #                       - "time_index"
+        #                       - "velocity_vector_length"
+        #                       - "velocity_vector"
+        #                       - "spatial_coordinates"
+        node_features: list                                       # R = ["rcs", "degree"]
+
+        # Description: List of initial edge features of the graph
+        # Form: Choose from:    - "point_pair_features"
+        #                       - "spatial_euclidean_distance"
+        #                       - "velocity_euclidean_distance"
+        #                       - "relative_position"
+        #                       - "relative_velocity"
+        edge_features: list                                       # R = ["relative_position"]
+
+        # Description: Choose directed or undirected edges
+        # Form: Choose from:    - "directed"  
+        #                       - "undirected" 
+        edge_mode: str                                            # R = "directed"
+
+        # Description: Distance used for distance calculation (only spatial distance or also velocity)
+        # Form: Choose from:    - "X"  
+        #                       - "XV" 
+        distance_definition: str                                  # R = "X"
+
+
+# ------------------------------ CONFIGS FOR "TRAIN.PY" ------------------------------#
+TRAIN:
+    MODEL_ARCHITECTURE:
+        # Description: Dimension of initial graph node features (depends on graph dataset creation)
+        node_feature_dimension: int                         # R = 5
+
+        # Description: Dimension of initial graph edge features (depends on graph dataset creation)
+        edge_feature_dimension: int                         # R = 2
+
+        # Description: Use batch normalization in MLPs
+        batch_norm_in_mlps: bool                            # O = True
+
+        # Description: Embedded initial node features with a MLP before applying graph convolutions
+        initial_node_feature_embedding: bool                # O = False
+
+        # Description: Embedded initial edge features with a MLP before applying graph convolutions
+        initial_edge_feature_embedding: bool                # O = False
+
+        # Description: MLP layer dimensions for initial node feature embedding
+        node_feature_embedding_layer_dimensions: list       # O = None
+
+        # Description: MLP layer dimensions for initial edge feature embedding
+        edge_feature_embedding_layer_dimensions: list       # O = None
+
+        # Description: Graph convolution layer dimensions (dimension of resulting node feature embedding)
+        conv_layer_dimensions: list                         # R = [50, 120]
+
+        # Description: Number of layers in message MLP of graph convolution layer
+        conv_pre_mlp_layer_number: int                      # O = 1
+
+        # Description: Number of layers in update MLP of graph convolution layer
+        conv_post_mlp_layer_number: int                     # O = 1
+
+        # Description: Graph convolution layer type
+        # Form: Choose from:    - "MPNNConv"
+        #                       - "RadarPointGNNConv" 
+        conv_layer_type: str                                # O = "MPNNConv"
+
+        # Description: Apply linear transformation to edge features to be of the same dimension like node features (before passing it to the message MLP of the graph conv. layer)
+        conv_use_edge_encoder: bool                         # O = False
+
+        # Description: Aggregation function to use
+        # Form: Choose from available functions in pytorch_geometric e.g:   - "max"
+        #                                                                   - "mean"
+        #                                                                   - "add"
+        aggregation_function: str                           # O = "max"
+
+        # Description: Layer dimensions if the classification head - last layer must match class number
+        classification_head_layer_dimensions: list          # R = [6]
+
+        # Description: Layer dimensions if the bounding box regression head - last layer must match the dimensions of the bounding box (4 for 2D aligned, 5 for 2D rotated)
+        regression_head_layer_dimensions: list              # R = [12, 12, 4]
+
+    TRAINING:
+        # Description: Dataset which is used for training and evaluation (either radarscenes or nuscenes)
+        dataset: str                        # R
+
+        # Description: Learning rate for the optimizer
+        learning_rate: float                # R = 0.001
+
+        # Description: Number of training epochs
+        epochs: int                         # R = 30
+
+        # Description: Batch size for the model training
+        batch_size: int                     # R = 20
+
+        # Description: Wether to shuffle the training data after each epoch
+        shuffle: bool                       # R = True
+
+        # Description: Label value (index) of the background class. Normally 5 for RadarScenes and 0 for nuScenes
+        bg_index: int
+    
+        # Description: Fix seed and use if possible deterministic operations in cuda (increases calculation time)
+        deterministic: bool                 # O = False
+        seed: int                           # O = 0
+
+        # Description: Weighting factor of each class for negative log likelihood loss for classification branch for model training (to handle class imbalance of the RadarScenes dataset)
+        class_weights: {"car": 1,
+                        "pedestrian": 1,
+                        "pedestrian_group": 1,
+                        "two_wheeler": 1, 
+                        "large_vehicle": 1,
+                        "background": 0.05}       # O: bg = 0.05, remaining classes = 1
+
+        # Description: Weighting factor of each class for negative log likelihood loss for classification branch for model validation
+        val_class_weights: {"car": 1,
+                            "pedestrian": 1,
+                            "pedestrian_group": 1,
+                            "two_wheeler": 1, 
+                            "large_vehicle": 1,
+                            "background": 0.05}
+
+        # Description: Weight for the bounding box regression loss term
+        bb_loss_weight: float               # O = 1
+
+        # Description: Sets each class weight automatically based on the number of points per class in the RadarScenes dataset so that (weight_class * number_points_class = const. for all classes)
+        set_weights_according_radar_scenes_distribution: bool   # 0 = False
+
+        # Description: Weight for the classification loss term
+        cls_loss_weight: float              # O = 1
+
+        # Description: Factor for the L2 regularization term
+        regularization_strength: float      # O = 1e-4
+
+        # Description: Reduction factor for the learning rate on a plateau
+        reduce_lr_on_plateau_factor: float  # O = 0.5
+
+        # Description: Number of epochs with no improvement to define a plateau
+        reduce_lr_on_plateau_patience: int  # O = 0
+
+        # Description: Learning rate reduction factor for exponential lr decay
+        exponential_lr_decay_factor: float # O = 0.0
+
+        # Description: If validation loss does not reach a new minimum after the defined number of epochs -> Stop training
+        early_stopping_patience: int        # O = 10
+
+        # Description: 
+        # The normal orientation angles of the bounding boxes are in range [0, pi]
+        # If this is set to true -> bb orientation angles are processed to be in range [-pi/2, pi/2] (angles from former range [pi/2, pi] are flipped to range [-pi/2, 0])
+        #                        -> Then they are passed trough a sin to be in range [-1, 1]
+        adapt_orientation_angle: bool       # O = False
+
+# ---------------------------- CONFIGS FOR "EVALUATE.PY" ----------------------------#
+EVALUATE:
+    POSTPROCESSING:
+        # Description: Split of the graph dataset to use for validation
+        # Form: Choose from:    - "train"
+        #                       - "test"
+        #                       - "validate"
+        split: str                                                  # R | "validate"
+
+        # Description: Intersection Over Union for overlapping bounding boxes to suppress
+        #              If two (or more) bounding boxes have a higher iou as defined here
+        #              -> All boxes are suppressed except the one with the highest classification score / confidence
+        iou_for_nms: float                                          # R = 0.01
+
+        # Label value (index) of the background class. Normally 5 for RadarScenes and 0 for nuScenes
+        bg_index: int
+
+        # Description: All bounding boxes of points with a object class classification score below this limit are removed
+        #              Each class has its own minimum score -> Allows class specific postprocessing
+        #                   - car points are more easy to classify -> higher score -> set limit higher (e.g. 0.8)
+        #                   - pedestrians are harder to classify -> lower score -> set limit lower (e.g. 0.6)
+        # Form: Dict of the form {"car": float,
+        #                         "pedestrian": float,
+        #                         "pedestrian_group": float,
+        #                         "two_wheeler": float,
+        #                         "large_vehicle": float}
+        min_object_score: dict                                      # R = {"car": 0.8, "pedestrian": 0.7, "pedestrian_group": 0.7, "two_wheeler": 0.7, "large_vehicle": 0.8}
+
+        # Description: All bounding boxes of points with a background class classification score above this limit are removed
+        max_score_for_background: float                             # R = 0.2
+
+        # Description: IOU of prediction and ground truth boxes to be a true positive
+        iou_for_mAP: float                                          # R = 0.3
+
+        # Description: Use point iou as basis for box evaluation, else the "normal" bounding box iou is used
+        use_point_iou: bool                                         # O = False
+
+        # In which format qre the rotated bounding boxes defined and used for training ?
+        # -> use the same setting as for: "CREATE_DATASET.invariances = str"
+        # -> Choose from: "none", "translation", "en"
+        bb_invariance: str                                            # O = "translation"
+
+        # If in training the orientation angles are transformed they need to be retransformed during postprocessing
+        # -> Set this to true if during the setting TRAINING.adapt_orientation_angle was also true
+        adapt_orientation_angle: bool                               # O = False
+
+        # Description: Wether to calculate the mAP value
+        get_mAP: bool                                               # O = True
+
+        # Description: Wether to calculate the confusion matrix
+        get_confusion: bool                                         # O = True
+
+        # Description: Wether to calculate the f1 value
+        get_segmentation_f1: bool                                   # O = True
+
+        # Description: Chose averaging strategy for calculating the sematic segmentation f1 score
+        # Form: Choose from available settings in sklearn:   - "micro"  
+        #                                                   - "macro" 
+        #                                                   - "weighted" 
+        #                                                   - None
+        f1_class_averaging: None / str                              # O = None
