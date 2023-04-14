@@ -16,18 +16,18 @@ The focus is on a modular implementation with the possibility to incorporate dif
 Results of our RadarGNN model for object detection and semantic segmentation on both the [nuScenes](https://www.nuscenes.org/) and the [RadarScenes](https://radar-scenes.com/) dataset. For more results, please refer to the related [paper](#citation).
 
 ### BEV Object Detection and Semantic Segmentation (on RadarScenes)
-| Model    | Invariance             | mAP      | F1       |
-|----------|------------------------|----------|----------|
-| RadarGNN | None                   | 19.4     | 68.1     |
-| RadarGNN | Translation            | **56.5** | **77.1** |
-| RadarGNN | Translation & Rotation | 19.6     | 76.5     |
+| Model    | Invariance             | mAP      | F1       | Checkpoint                                                              |
+|----------|------------------------|----------|----------|-------------------------------------------------------------------------|
+| RadarGNN | None                   | 19.4     | 68.1     | [Link](https://zenodo.org/record/7822037/files/model_01.zip?download=1) |
+| RadarGNN | Translation            | **56.5** | **77.1** | [Link](https://zenodo.org/record/7822037/files/model_02.zip?download=1) |
+| RadarGNN | Translation & Rotation | 19.6     | 76.5     | [Link](https://zenodo.org/record/7822037/files/model_03.zip?download=1) |
 
 
 ### 3D Object Detection and Semantic Segmentation (on nuScenes)
-| Model    | Modality | Split | mAP | NDS | F1   |
-|----------|----------|-------|-----|-----|------|
-| RadarGNN | Radar    | val   | 0.7 | 7.5 | 19.6 |
-| RadarGNN | Radar    | test  | 0.7 | 5.9 | -    |
+| Model    | Modality | Split | mAP | NDS | F1   | Checkpoint                                                              |
+|----------|----------|-------|-----|-----|------|-------------------------------------------------------------------------|
+| RadarGNN | Radar    | val   | 0.7 | 7.5 | 19.6 | [Link](https://zenodo.org/record/7822037/files/model_04.zip?download=1) |
+| RadarGNN | Radar    | test  | 0.7 | 5.9 | -    | [Link](https://zenodo.org/record/7822037/files/model_04.zip?download=1) |
 
 _Note: The RadarGNN model was not designed for 3D object detection on the nuScenes dataset but rather for bird’s-eye view (BEV) object detection on the RadarScenes dataset._
 <br>
