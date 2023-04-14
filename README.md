@@ -1,4 +1,4 @@
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.7822037.svg)](https://doi.org/10.5281/zenodo.7822037)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.7822037.svg)](https://doi.org/10.48550/arXiv.2304.06547)
 [![Linux](https://img.shields.io/badge/os-linux-blue.svg)](https://www.linux.org/)
 [![Docker](https://badgen.net/badge/icon/docker?icon=docker&label)](https://www.docker.com/)
 [![Python 3.8](https://img.shields.io/badge/python-3.8-blue.svg)](https://www.python.org/downloads/release/python-380/)
@@ -167,3 +167,15 @@ arguments:
     --config       Path to the created configuration.yml file
 ```
 Within the provided "model" folder a new "evaluation" folder is created, in which the evaluation results are saved.
+
+## Citation
+If RadarGNN is useful or relevant to your research, please kindly recognize our contributions by citing our paper:
+
+```bibtex
+@article{fent2023radargnn,
+  title={RadarGNN: Transformation Invariant Graph Neural Network for Radar-based Perception},
+  author={Fent, Felix and Bauerschmidt, Philipp and Lienkamp, Markus},
+  journal={arXiv preprint arXiv:2304.06547},
+  year={2023}
+}
+```
