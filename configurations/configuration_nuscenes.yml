@@ -3,7 +3,7 @@ CREATE_DATASET:
     dataset: nuscenes
 
     DATASET_PROCESSING:
-        version: "v1.0-trainval"
+        version: "v1.0-test"
         nsweeps: 6
         crop_point_cloud: False
         bounding_boxes_aligned: False
@@ -54,7 +54,7 @@ TRAIN:
 EVALUATE:
 
     POSTPROCESSING:
-        split: "validate"
+        split: "test"
         bg_index: 0
 
         max_score_for_background: 0.1
